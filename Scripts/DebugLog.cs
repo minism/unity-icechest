@@ -9,11 +9,15 @@ namespace Ice {
 
   // UI component which renders all unity debug messages into UI text.
   public class DebugLog : MonoBehaviour {
+    public int numLines = 150;
+
     private Text textComponent;
-    private CircularBuffer<string> buffer = new CircularBuffer<string>(150);
+    private CircularBuffer<string> buffer;
 
     void Start() {
+      buffer = new CircularBuffer<string>(numLines);
       textComponent = GetComponentInChildren<Text>();
+      FixLayout();
     }
 
     void OnEnable() {
@@ -22,6 +26,18 @@ namespace Ice {
 
     void OnDisable() {
       Application.logMessageReceived -= HandleLogMessage;
+    }
+
+    [ExposeMethod]
+    void FixLayout() {
+      textComponent = GetComponentInChildren<Text>();
+
+      var rect = textComponent.GetComponent<RectTransform>();
+      rect.anchorMin = Vector2.zero;
+      rect.anchorMax = new Vector2(1, 2);
+      rect.sizeDelta = Vector2.zero;
+
+      textComponent.alignment = TextAnchor.LowerLeft;
     }
 
     private string JoinBuffer() {
@@ -34,26 +50,25 @@ namespace Ice {
     }
 
     private void HandleLogMessage(string logLine, string stack, LogType type) {
-      var prefix = PrefixForLogType(type);
-      buffer.PushBack(prefix + logLine);
+      buffer.PushBack(FormatLogLine(logLine, type));
       if (textComponent == null) {
         return;
       }
       textComponent.text = JoinBuffer();
     }
 
-    private static string PrefixForLogType(LogType type) {
+    private static string FormatLogLine(string logLine, LogType type) {
       switch (type) {
         case LogType.Assert:
-          return "[A] ";
+          return $"[A] <color=orange>[A] {logLine}</color>";
         case LogType.Error:
-          return "[E] ";
+          return $"[E] <color=red>[A] {logLine}</color>";
         case LogType.Exception:
-          return "[Ex] ";
+          return $"[X] <color=red>[A] {logLine}</color>";
         case LogType.Warning:
-          return "[W] ";
+          return $"[W] <color=yellow>[A] {logLine}</color>";
       }
-      return "[I] ";
+      return $"[I] {logLine}";
     }
   }
 
