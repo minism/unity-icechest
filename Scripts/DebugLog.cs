@@ -14,7 +14,7 @@ namespace Ice {
     private Text textComponent;
     private CircularBuffer<string> buffer;
 
-    void Start() {
+    void Awake() {
       buffer = new CircularBuffer<string>(numLines);
       textComponent = GetComponentInChildren<Text>();
       FixLayout();
