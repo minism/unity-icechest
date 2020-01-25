@@ -15,7 +15,6 @@ namespace Ice {
     private float accumulation;
 
     private void Start() {
-      // TODO: Cached.
       label = GetComponent<Text>();
     }
 
