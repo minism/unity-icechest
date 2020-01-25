@@ -21,7 +21,7 @@ namespace Ice {
     }
 
     // TODO: See if this can be converted to a vector2 input.
-    public void Move(Vector3 velocity) {
+    public void Move(Vector3 velocity, bool standingOnSurface = false) {
       UpdateRayOrigins();
       collisions.Reset();
       if (velocity.y < 0) {
@@ -34,6 +34,12 @@ namespace Ice {
         HandleVerticalCollisions(ref velocity);
       }
       transform.Translate(velocity);
+
+      // External objects like moving platforms can simply inform us we're standing on them instead
+      // of us needing to calculate it based on input + gravity, so we can always jump.
+      if (standingOnSurface) {
+        collisions.below = true;
+      }
     }
 
     private void HandleHorizontalCollisions(ref Vector3 velocity) {
