@@ -22,7 +22,7 @@ namespace Ice {
 
     // TODO: See if this can be converted to a vector2 input.
     public void Move(Vector3 velocity) {
-      UpdateRaycastOrigins();
+      UpdateRayOrigins();
       collisions.Reset();
       if (velocity.y < 0) {
         MaybeDescendSlope(ref velocity);

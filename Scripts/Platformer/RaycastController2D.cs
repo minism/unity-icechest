@@ -23,12 +23,36 @@ namespace Ice {
     }
 
     protected IEnumerable<RaycastHit2D> CheckVerticalCollisions(Vector3 velocity) {
+      return CheckVerticalCollisions(velocity, true);
+    }
+
+    protected IEnumerable<RaycastHit2D> CheckVerticalCollisions(
+        Vector3 velocity, bool projectVelocity) {
       float directionY = Mathf.Sign(velocity.y);
       float rayLength = Mathf.Abs(velocity.y) + skinWidth;
       for (int i = 0; i < vertRayCount; i++) {
         Vector2 ro = directionY < 0 ? rayOrigins.bottomLeft : rayOrigins.topLeft;
-        ro += Vector2.right * (vertRaySpacing * i + velocity.x);
+        ro += Vector2.right * (vertRaySpacing * i + (projectVelocity ? velocity.x : 0));
+        Debug.DrawRay(ro, Vector2.up * directionY);
         var hit = Physics2D.Raycast(ro, Vector2.up * directionY, rayLength, collisionMask);
+        if (hit) {
+          // TODO(BUG): For moving platforms with multiple passengers, we should not short circuit here.
+          rayLength = hit.distance; // Update ray length so shortest ray in the loop wins.
+          yield return hit;
+        }
+      }
+      yield break;
+    }
+
+    protected IEnumerable<RaycastHit2D> CheckHorizontalCollisions(
+        Vector3 velocity, bool projectVelocity) {
+      float directionX = Mathf.Sign(velocity.x);
+      float rayLength = Mathf.Abs(velocity.x) + skinWidth;
+      for (int i = 0; i < horizRayCount; i++) {
+        Vector2 ro = directionX < 0 ? rayOrigins.bottomLeft : rayOrigins.bottomRight;
+        ro += Vector2.up * (horizRaySpacing * i + (projectVelocity ? velocity.y : 0));
+        Debug.DrawRay(ro, Vector2.right * directionX);
+        var hit = Physics2D.Raycast(ro, Vector2.right * directionX, rayLength, collisionMask);
         if (hit) {
           rayLength = hit.distance; // Update ray length so shortest ray in the loop wins.
           yield return hit;
@@ -41,13 +65,14 @@ namespace Ice {
       var bounds = GetSkinBounds();
 
       horizRayCount = Mathf.Clamp(horizRayCount, 2, int.MaxValue);
-      vertRayCount = Mathf.Clamp(horizRayCount, 2, int.MaxValue);
+      vertRayCount = Mathf.Clamp(vertRayCount, 2, int.MaxValue);
       horizRaySpacing = bounds.size.y / (horizRayCount - 1);
       vertRaySpacing = bounds.size.x / (vertRayCount - 1);
     }
 
-    protected void UpdateRaycastOrigins() {
+    protected void UpdateRayOrigins() {
       var bounds = GetSkinBounds();
+
       rayOrigins.topLeft = new Vector2(bounds.min.x, bounds.max.y);
       rayOrigins.topRight = new Vector2(bounds.max.x, bounds.max.y);
       rayOrigins.bottomLeft = new Vector2(bounds.min.x, bounds.min.y);
