@@ -22,6 +22,21 @@ namespace Ice {
       UpdateRaySpacing();
     }
 
+    protected IEnumerable<RaycastHit2D> CheckVerticalCollisions(Vector3 velocity) {
+      float directionY = Mathf.Sign(velocity.y);
+      float rayLength = Mathf.Abs(velocity.y) + skinWidth;
+      for (int i = 0; i < vertRayCount; i++) {
+        Vector2 ro = directionY < 0 ? rayOrigins.bottomLeft : rayOrigins.topLeft;
+        ro += Vector2.right * (vertRaySpacing * i + velocity.x);
+        var hit = Physics2D.Raycast(ro, Vector2.up * directionY, rayLength, collisionMask);
+        if (hit) {
+          rayLength = hit.distance; // Update ray length so shortest ray in the loop wins.
+          yield return hit;
+        }
+      }
+      yield break;
+    }
+
     protected void UpdateRaySpacing() {
       var bounds = GetSkinBounds();
 
