@@ -81,7 +81,7 @@ namespace Ice {
         foreach (var hit in CheckHorizontalCollisions(velocity, false)) {
           if (!passengersVisited.Contains(hit.transform)) {
             float pushX = velocity.x - (hit.distance - skinWidth) * dirY;
-            float pushY = 0;
+            float pushY = -skinWidth; // Always use small downward force in case we're sliding on ground.
             movements.Add(new PassengerMovement {
               transform = hit.transform,
               velocity = new Vector3(pushX, pushY),
