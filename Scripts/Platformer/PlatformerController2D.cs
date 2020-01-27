@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,8 +21,8 @@ namespace Ice {
     }
 
     // TODO: See if this can be converted to a vector2 input.
-    public void Move(Vector3 velocity) {
-      UpdateRaycastOrigins();
+    public void Move(Vector3 velocity, bool standingOnSurface = false) {
+      UpdateRayOrigins();
       collisions.Reset();
       if (velocity.y < 0) {
         MaybeDescendSlope(ref velocity);
@@ -33,6 +34,12 @@ namespace Ice {
         HandleVerticalCollisions(ref velocity);
       }
       transform.Translate(velocity);
+
+      // External objects like moving platforms can simply inform us we're standing on them instead
+      // of us needing to calculate it based on input + gravity, so we can always jump.
+      if (standingOnSurface) {
+        collisions.below = true;
+      }
     }
 
     private void HandleHorizontalCollisions(ref Vector3 velocity) {
@@ -69,37 +76,21 @@ namespace Ice {
             if (collisions.climbingSlope) {
               velocity.y = Mathf.Tan(collisions.slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
             }
-
-            Debug.DrawRay(ro, Vector2.right * dirX * rayLength, Color.yellow);
           }
-        } else {
-          Debug.DrawRay(ro, Vector2.right * dirX * rayLength, Color.red);
         }
       }
     }
 
     private void HandleVerticalCollisions(ref Vector3 velocity) {
       float dirY = Mathf.Sign(velocity.y);
-      float rayLength = Mathf.Abs(velocity.y) + skinWidth;
-      for (int i = 0; i < vertRayCount; i++) {
-        Vector2 ro = dirY < 0 ? rayOrigins.bottomLeft : rayOrigins.topLeft;
-        ro += Vector2.right * (vertRaySpacing * i + velocity.x);
+      foreach (var hit in CheckVerticalCollisions(velocity)) {
+        collisions.below = dirY < 0;
+        collisions.above = dirY > 0;
+        velocity.y = (hit.distance - skinWidth) * dirY;
 
-        var hit = Physics2D.Raycast(ro, Vector2.up * dirY, rayLength, collisionMask);
-        if (hit) {
-          collisions.below = dirY < 0;
-          collisions.above = dirY > 0;
-          velocity.y = (hit.distance - skinWidth) * dirY;
-          rayLength = hit.distance; // Update ray length so shortest ray in the loop wins.
-
-          // If we collide vertically, fix the X vector based on the slope angle.
-          if (collisions.climbingSlope) {
-            velocity.x = velocity.y / Mathf.Tan(collisions.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
-          }
-
-          Debug.DrawRay(ro, Vector2.up * dirY * rayLength, Color.yellow);
-        } else {
-          Debug.DrawRay(ro, Vector2.up * dirY * rayLength, Color.red);
+        // If we collide vertically, fix the X vector based on the slope angle.
+        if (collisions.climbingSlope) {
+          velocity.x = velocity.y / Mathf.Tan(collisions.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
         }
       }
 
@@ -140,18 +131,20 @@ namespace Ice {
       var hit = Physics2D.Raycast(ro, -Vector2.up, Mathf.Infinity, collisionMask);
       if (hit) {
         float descendSlopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-        if (descendSlopeAngle != 0 && descendSlopeAngle <= maxDescendAngle) {
-          if (Mathf.Sign(hit.normal.x) == dirX) {
-            if (hit.distance - skinWidth <= Mathf.Tan(descendSlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x)) {
-              float moveDist = Mathf.Abs(velocity.x);
-              float descendVelocityY = Mathf.Sin(descendSlopeAngle * Mathf.Deg2Rad) * moveDist;
-              velocity.x = Mathf.Cos(descendSlopeAngle * Mathf.Deg2Rad) * moveDist * Mathf.Sign(velocity.x);
-              velocity.y -= descendVelocityY;
-              collisions.below = true; // Slope always counts as grounded.
-              collisions.descendingSlope = true;
-              collisions.slopeAngle = descendSlopeAngle;
-            }
-          }
+        if (descendSlopeAngle != 0 &&                 // The angle is non-zero.
+            descendSlopeAngle <= maxDescendAngle &&   // This is a new slope.
+            Mathf.Sign(hit.normal.x) == dirX &&       // We're traveling down the slope.
+            hit.distance - skinWidth <=               // We will collide with the slope.
+                Mathf.Tan(descendSlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x)) {
+          float moveDist = Mathf.Abs(velocity.x);
+          float descendVelocityY = Mathf.Sin(descendSlopeAngle * Mathf.Deg2Rad) * moveDist;
+          velocity.x = Mathf.Cos(descendSlopeAngle * Mathf.Deg2Rad) * moveDist * Mathf.Sign(velocity.x);
+          velocity.y -= descendVelocityY;
+
+          // Update collisions.
+          collisions.below = true; // Slope always counts as grounded.
+          collisions.descendingSlope = true;
+          collisions.slopeAngle = descendSlopeAngle;
         }
       }
     }

@@ -60,13 +60,13 @@ namespace Ice {
     private static string FormatLogLine(string logLine, LogType type) {
       switch (type) {
         case LogType.Assert:
-          return $"[A] <color=orange>[A] {logLine}</color>";
+          return $"<color=orange>[A] {logLine}</color>";
         case LogType.Error:
-          return $"[E] <color=red>[A] {logLine}</color>";
+          return $"<color=red>[E] {logLine}</color>";
         case LogType.Exception:
-          return $"[X] <color=red>[A] {logLine}</color>";
+          return $"<color=red>[X] {logLine}</color>";
         case LogType.Warning:
-          return $"[W] <color=yellow>[A] {logLine}</color>";
+          return $"<color=yellow>[W] {logLine}</color>";
       }
       return $"[I] {logLine}";
     }

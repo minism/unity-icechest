@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Ice {
   public class DontDestroyOnLoad : MonoBehaviour {
