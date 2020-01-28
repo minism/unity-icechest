@@ -8,7 +8,7 @@ namespace Ice {
   /// strategies. Detailed description at:
   /// https://www.reddit.com/r/Unity2D/comments/4q0pxe/orthographic_camera_scaling_strategies_for/
   [ExecuteInEditMode]
-  public class CameraScaler : MonoBehaviour {
+  public class CameraScaler2D : MonoBehaviour {
 
     public enum ScaleMode {
       // Maintain a fixed ratio of world units to screen pixels, regardless of window size.
