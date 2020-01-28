@@ -118,7 +118,7 @@ namespace Ice {
       transform.position = (Vector3)focalPoint + Vector3.forward * -10f;
     }
 
-    private void OnDrawGizmos() {
+    private void OnDrawGizmosSelected() {
       Gizmos.color = new Color(0, 0.8f, 0, 0.25f);
       Gizmos.DrawCube(focusBox.center, focusBoxSize);
     }

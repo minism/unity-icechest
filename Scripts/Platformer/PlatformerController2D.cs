@@ -48,6 +48,7 @@ namespace Ice {
       for (int i = 0; i < horizRayCount; i++) {
         Vector2 ro = dirX < 0 ? rayOrigins.bottomLeft : rayOrigins.bottomRight;
         ro += Vector2.up * (horizRaySpacing * i);
+        Debug.DrawRay(ro, Vector2.right * dirX);
 
         var hit = Physics2D.Raycast(ro, Vector2.right * dirX, rayLength, collisionMask);
         if (hit) {
