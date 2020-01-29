@@ -18,7 +18,7 @@ namespace Ice {
     [SerializeField]
     private Transform _target;
 
-    public Vector2 focusBoxSize;
+    public Vector2 focusBoxSize = new Vector2(3, 3);
     public float cameraHeight = 0;
     public float lookAheadDistance = 1;
     public float smoothTime = 0.2f;
