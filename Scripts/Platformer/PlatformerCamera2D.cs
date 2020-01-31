@@ -19,6 +19,7 @@ namespace Ice {
     private Transform _target;
 
     public Vector2 focusBoxSize = new Vector2(3, 3);
+    public bool lockXAxis, lockYAxis;
     public float cameraHeight = 0;
     public float lookAheadDistance = 1;
     public float smoothTime = 0.2f;
@@ -33,6 +34,8 @@ namespace Ice {
 
     // Velocity smoothing state.
     private float smoothVelocityX, smoothVelocityY;
+
+    private Vector3 initialPosition;
 
     // An input provider needed for lookahead functionality.
     public interface IInputProvider {
@@ -80,6 +83,7 @@ namespace Ice {
     }
 
     private void Start() {
+      initialPosition = transform.position;
       EnsureTargetReferences();
       focusBox = new FocusBox(targetCollider.bounds, focusBoxSize);
     }
@@ -115,7 +119,11 @@ namespace Ice {
       focalPoint += Vector2.right * currentLookAheadX;
 
       // Set final camera position.
-      transform.position = (Vector3)focalPoint + Vector3.forward * -10f;
+      var finalPosition = (Vector3)focalPoint + Vector3.forward * -10f;
+      transform.position = new Vector3(
+          lockXAxis ? initialPosition.x : finalPosition.x,
+          lockYAxis ? initialPosition.y : finalPosition.y,
+          finalPosition.z);
     }
 
     private void OnDrawGizmosSelected() {
