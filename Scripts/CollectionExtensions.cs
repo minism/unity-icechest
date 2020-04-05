@@ -23,7 +23,7 @@ namespace Ice {
         return element;
       }
 
-      public static IEnumerable<T> Shuffled<T>(this IList<T> list) {
+      public static IList<T> Shuffled<T>(this IList<T> list) {
         return list.OrderBy(_ => rand.Next()).ToList();
       }
 
