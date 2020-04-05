@@ -9,7 +9,7 @@ namespace Ice {
     }
 
     public static int RoundToMultiple(float value, int multiple) {
-      return RoundToMultiple((int)value, multiple);
+      return RoundToMultiple(Mathf.FloorToInt(value), multiple);
     }
 
     public static Vector3 RoundToMultiple(Vector3 vector, int multiple) {
