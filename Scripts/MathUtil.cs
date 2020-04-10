@@ -18,5 +18,12 @@ namespace Ice {
           RoundToMultiple(vector.y, multiple),
           RoundToMultiple(vector.z, multiple));
     }
+
+    public static Vector3 Round(Vector3 vector) {
+      return new Vector3(
+        Mathf.Round(vector.x),
+        Mathf.Round(vector.y),
+        Mathf.Round(vector.z));
+    }
   }
 }
