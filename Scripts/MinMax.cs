@@ -1,4 +1,4 @@
-﻿namespace Ice {
+namespace Ice {
 
   public class MinMax<T> where T : System.IComparable {
     public T Max { get; private set; }

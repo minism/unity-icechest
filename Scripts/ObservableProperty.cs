@@ -1,4 +1,4 @@
-﻿namespace Ice {
+namespace Ice {
 
   public class ObservableProperty<T> {
     private T _value;

@@ -1,4 +1,4 @@
-﻿namespace Ice {
+namespace Ice {
 
   public interface IPoolable {
     void OnSpawn();

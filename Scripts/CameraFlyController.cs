@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 /// Ripped from Unity - Basic camera fly controller for debugging.
 namespace Ice {
