@@ -19,10 +19,7 @@ namespace Ice {
     public void Update(float dt, float value) {
       accumlator += value;
       timer += dt;
-      Debug.Log(timer);
-
       if (timer >= windowSize) {
-        Debug.Log("PASSED TIMER");
         Average = accumlator / timer;
         timer -= windowSize;
         accumlator = 0.0f;
