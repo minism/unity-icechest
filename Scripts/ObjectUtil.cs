@@ -16,14 +16,27 @@ namespace Ice {
       }
     }
 
-    public static void DestroyChildren (GameObject parent) {
+    public static void DestroyChildren(GameObject parent) {
       DestroyChildren(parent.transform);
     }
 
-    public static void DestroyChildren (Transform parent) {
+    public static void DestroyChildren(Transform parent) {
       foreach (Transform child in parent) {
         Object.Destroy(child.gameObject);
       }
+    }
+
+    public static GameObject FindChildWithTag(GameObject parent, string tag) {
+      return FindChildWithTag(parent.transform, tag);
+    }
+
+    public static GameObject FindChildWithTag(Transform parent, string tag) {
+      foreach (Transform child in parent) {
+        if (child.CompareTag(tag)) {
+          return child.gameObject;
+        }
+      }
+      return null;
     }
   }
 } // namespace Ice
