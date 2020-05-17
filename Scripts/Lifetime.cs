@@ -8,6 +8,11 @@ namespace Ice {
   public class Lifetime : MonoBehaviour {
 
     public float lifetime;
+    public float TimeLeft {
+      get {
+        return Time.time - startTime;
+      }
+    }
 
     private float startTime;
 
@@ -16,7 +21,7 @@ namespace Ice {
     }
 
     void Update() {
-      if (lifetime > 0 && Time.time - startTime > lifetime) {
+      if (lifetime > 0 && TimeLeft > lifetime) {
         Destroy(gameObject);
       }
     }
