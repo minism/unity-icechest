@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using CircularBuffer;
 using System.Text;
+using System;
 
 namespace Ice {
 
@@ -58,17 +59,19 @@ namespace Ice {
     }
 
     private static string FormatLogLine(string logLine, LogType type) {
+      var dt = DateTime.Now;
+      var ts = dt.ToString("HH:mm:ss");
       switch (type) {
         case LogType.Assert:
-          return $"<color=orange>[A] {logLine}</color>";
+          return $"<color=orange>[{ts}] {logLine}</color>";
         case LogType.Error:
-          return $"<color=red>[E] {logLine}</color>";
+          return $"<color=red>[{ts}] {logLine}</color>";
         case LogType.Exception:
-          return $"<color=red>[X] {logLine}</color>";
+          return $"<color=red>[Exception] [{ts}] {logLine}</color>";
         case LogType.Warning:
-          return $"<color=yellow>[W] {logLine}</color>";
+          return $"<color=yellow>[{ts}] {logLine}</color>";
       }
-      return $"[I] {logLine}";
+      return $"[{ts}] {logLine}";
     }
   }
 
