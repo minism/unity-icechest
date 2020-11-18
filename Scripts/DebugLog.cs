@@ -44,8 +44,7 @@ namespace Ice {
     private string JoinBuffer() {
       StringBuilder builder = new StringBuilder();
       foreach (var line in buffer) {
-        builder.Append(line);
-        builder.Append("\n");
+        builder.AppendLine(line);
       }
       return builder.ToString();
     }
